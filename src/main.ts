@@ -3,6 +3,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import * as session from 'express-session';
+import * as passport from 'passport';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { PrismaClient } from '@prisma/client';
 
@@ -42,6 +43,8 @@ async function bootstrap() {
       }),
     }),
   );
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   await app.listen(process.env.PORT || 3000);
 }
