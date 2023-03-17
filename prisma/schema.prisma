@@ -34,3 +34,10 @@ model Profile {
 
   @@map(name: "profile")
 }
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime @map(name: "expires_at")
+}
