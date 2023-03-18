@@ -1,8 +1,17 @@
-import { Controller, Post, Inject, UseGuards, Req, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Inject,
+  UseGuards,
+  Req,
+  Get,
+  Query,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request } from 'express';
 import { LocalGuard } from './guards/local-guard';
 import { IsAuthenticatedGuard } from './guards/is-authenticated-guard';
+import { VerifyUserDto } from './dto/verify-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -11,6 +20,11 @@ export class AuthController {
   @Post('login')
   login(@Req() req: Request) {
     return req.user;
+  }
+
+  @Get('verify')
+  activateUser(@Query() query: VerifyUserDto) {
+    return this.authService.activateUser(query);
   }
 
   @UseGuards(IsAuthenticatedGuard)
