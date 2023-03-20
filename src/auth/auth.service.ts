@@ -25,10 +25,6 @@ export class AuthService {
 
   async activateUser(query: VerifyUserDto) {
     const { userId, verificationToken } = query;
-    await this.userService.findUserByIdAndActivationToken(
-      userId,
-      verificationToken,
-    );
     await this.userService.activateUser(userId, verificationToken);
     return { message: 'User successfully activated' };
   }

@@ -27,14 +27,16 @@ export class UserService {
     }
     const hashPassword = await bcrypt.hash(data.password, 10);
     data.password = hashPassword;
-    const payload: VerifyUserPayload = { type: 'Activation Token' };
     const user = await this.prismaClient.user.create({
       data: {
         ...data,
-        verificationToken: this.jwtService.sign(payload),
         profile: { create: {} },
       },
     });
+    const userId = user.id;
+    const payload: VerifyUserPayload = { type: 'Activation Token', userId };
+    const token = this.jwtService.sign(payload);
+    await this.prismaClient.activationToken.create({ data: { userId, token } });
     delete user.password;
     return user;
   }
@@ -55,28 +57,16 @@ export class UserService {
   async activateUser(id: string, token: string) {
     try {
       const payload: VerifyUserPayload = await this.jwtService.verify(token);
-      if (payload.type !== 'Activation Token') {
+      if (payload.type !== 'Activation Token' || payload.userId !== id) {
         throw new Error();
       }
+      this.prismaClient.activationToken.delete({ where: { userId: id } });
       return this.prismaClient.user.update({
         where: { id },
         data: { isVerified: true },
       });
     } catch (_: any) {
       throw new UnprocessableEntityException('This action can not be perfomed');
-    }
-  }
-
-  async findUserByIdAndActivationToken(id: string, verificationToken: string) {
-    try {
-      const user = await this.prismaClient.user.findFirstOrThrow({
-        where: { id, verificationToken },
-      });
-      return user;
-    } catch (_: any) {
-      throw new UnprocessableEntityException(
-        'This action can not be performed',
-      );
     }
   }
 }

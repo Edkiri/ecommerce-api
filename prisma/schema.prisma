@@ -11,16 +11,16 @@ datasource db {
 }
 
 model User {
-  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email             String   @unique
-  isVerified        Boolean  @default(false) @map(name: "is_verified")
-  verificationToken String   @map(name: "verification_token")
-  displayName       String   @map(name: "display_name")
-  password          String?
-  profile           Profile?
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email       String   @unique
+  isVerified  Boolean  @default(false) @map(name: "is_verified")
+  displayName String   @map(name: "display_name")
+  password    String?
+  profile     Profile?
 
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  createdAt       DateTime         @default(now()) @map(name: "created_at")
+  updatedAt       DateTime         @updatedAt @map(name: "updated_at")
+  activationToken activationToken?
 
   @@map(name: "user")
 }
@@ -44,5 +44,18 @@ model Session {
   data      String
   expiresAt DateTime @map(name: "expires_at")
 
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
   @@map(name: "session")
+}
+
+model activationToken {
+  token String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique @map("user_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
 }
