@@ -29,18 +29,27 @@ CREATE TABLE "session" (
     "sid" TEXT NOT NULL,
     "data" TEXT NOT NULL,
     "expires_at" TIMESTAMP(3) NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "session_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "activationToken" (
+CREATE TABLE "activation_token" (
     "token" TEXT NOT NULL,
-    "user_id" UUID NOT NULL,
+    "user_id" UUID NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "product" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "name" TEXT NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
+    "description" TEXT,
+    "image_url" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "product_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -53,10 +62,7 @@ CREATE UNIQUE INDEX "profile_user_id_key" ON "profile"("user_id");
 CREATE UNIQUE INDEX "session_sid_key" ON "session"("sid");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "activationToken_user_id_key" ON "activationToken"("user_id");
+CREATE UNIQUE INDEX "activation_token_user_id_key" ON "activation_token"("user_id");
 
 -- AddForeignKey
 ALTER TABLE "profile" ADD CONSTRAINT "profile_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "activationToken" ADD CONSTRAINT "activationToken_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;

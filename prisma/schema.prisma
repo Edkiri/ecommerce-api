@@ -18,9 +18,8 @@ model User {
   password    String?
   profile     Profile?
 
-  createdAt       DateTime         @default(now()) @map(name: "created_at")
-  updatedAt       DateTime         @updatedAt @map(name: "updated_at")
-  activationToken activationToken?
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
 
   @@map(name: "user")
 }
@@ -44,18 +43,42 @@ model Session {
   data      String
   expiresAt DateTime @map(name: "expires_at")
 
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @updatedAt @map(name: "updated_at")
-
   @@map(name: "session")
 }
 
 model activationToken {
-  token String
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token  String
   userId String @unique @map("user_id") @db.Uuid
+
+  @@map(name: "activation_token")
+}
+
+model Product {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  price       Float
+  isPublic    Boolean @default(false) @map(name: "is_public")
+  stock       Int
+  description String?
+  imageUrl    String? @map(name: "image_url")
+
+  categories Category[]
 
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@map(name: "product")
+}
+
+model Category {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String @unique
+  slugName String @unique @map(name: "slug_name")
+
+  products Product[]
+
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@map(name: "category")
 }
